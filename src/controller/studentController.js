@@ -19,7 +19,7 @@ export const findStudent = async (req, res) => {
             "status": 404,
             "error": "Not Found",
             "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
+            "path": req.path
         });
     }
 }
@@ -29,62 +29,57 @@ export const deleteStudent = async (req, res) => {
     if (student) {
         return res.json(student);
     } else {
-        return res.status(404).json({
+        return res.status(404).send({
             "timestamp": new Date().toISOString(),
             "status": 404,
             "error": "Not Found",
             "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
+            "path": req.path
         });
     }
 }
 
 export const updateStudent = async (req, res) => {
-    const updatedStudent = await service.updateStudent(req.params.id, req.body);
-    if (updatedStudent) {
-        return res.json(updatedStudent);
+    const student = await service.updateStudent(req.params.id, req.body);
+    if (student) {
+        return res.json(student);
     } else {
-        return res.status(404).json({
+        return res.status(404).send({
             "timestamp": new Date().toISOString(),
             "status": 404,
             "error": "Not Found",
             "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
+            "path": req.path
         });
     }
 }
 
 export const addScore = async (req, res) => {
-    const { exam, score } = req.body;
-    const success = await service.addScore(req.params.id, exam, score);
+    const success = await service.addScore(req.params.id, req.body.examName, req.body.score);
     if (success) {
         return res.status(204).send();
     } else {
-        return res.status(404).json({
+        return res.status(404).send({
             "timestamp": new Date().toISOString(),
             "status": 404,
             "error": "Not Found",
             "message": `Student with id ${req.params.id} not found`,
-            "path": req.params
+            "path": req.path
         });
     }
 }
 
-export const findStudentsByName = async (req, res) => {
+export const findByName = async (req, res) => {
     const students = await service.findStudentsByName(req.params.name);
     return res.json(students);
 }
 
-export const countStudentsByNames = async (req, res) => {
-    const names = req.body;
-    const count = await service.countStudentsByNames(names);
-    return res.json({ count });
+export const countByNames = async (req, res) => {
+    const count = await service.countStudentsByNames(req.query.names);
+    return res.json(count);
 }
 
-export const findStudentsByMinScore = async (req, res) => {
-    const { exam, minScore } = req.params;
-    const students = await service.findStudentsByMinScore(exam, minScore);
+export const findByMinScore = async (req, res) => {
+    const students = await service.findStudentsByMinScore(req.params.exam, req.params.minScore);
     return res.json(students);
 }
-
-//TODO: Homework implement other operations
