@@ -1,32 +1,50 @@
-export const addStudent = async student => {
-    //TODO: Implement addStudent, return true if student was added successfully and false otherwise
-}
+import * as repo from "../repository/studentRepository.js";
+
+export const addStudent = async student => repo.createStudent(student);
 
 export const findStudent = async id => {
-//TODO: Implement findStudent
+    const student = await repo.findStudentById(+id);
+    return renameId(student);
 }
 
-export const deleteStudent = async id => {
-//TODO: Implement deleteStudent
+export const deleteStudent = async (id) => {
+    let student = repo.deleteStudent(+id);
+    if (student) {
+        student.password = undefined;
+    }
+    return renameId(student);
 }
 
 export const updateStudent = async (id, data) => {
-//TODO: Implement updateStudent
+    const student = await repo.updateStudent(+id, data);
+    return renameId(student);
 }
 
-export const addScore = async (id, exam, score) => {
-    //TODO: Implement addScore
+export const addScore = async (id, exam, score) => await repo.updateStudent(+id, {[`scores.${exam}`]: score});
+
+export const findStudentsByName = async (name) => {
+    const students = await repo.findStudentsByName(name);
+    return students.map(renameId);
 }
 
-export const findStudentsByName = async name => {
-    //TODO: Implement findStudentsByName
-}
-
-export const countStudentsByNames = async names => {
-    //TODO Implement countStudentsByNames
+export const countStudentsByNames = async (names) => {
+    names = Array.isArray(names) ? names : [names];
+    return await repo.countStudentsByNames(names);
 }
 
 export const findStudentsByMinScore = async (exam, minScore) => {
-    //TODO: Implement findStudentsByScore
+    const students = await repo.findStudentsByMinScore(exam, +minScore);
+    return students.map(renameId);
 }
 
+function renameId(student) {
+    //TODO HW2 return student with renames id (_id -> id)
+    //Use this in function where need rename id
+    if (!student) return null;
+    const studentObj = student.toObject ? student.toObject() : {...student};
+
+    studentObj.id = studentObj._id;
+    delete studentObj._id;
+    delete studentObj.password;
+    return studentObj;
+}
